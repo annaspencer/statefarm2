@@ -1,13 +1,59 @@
-image: node:latest
+image:
+  name: hashicorp/terraform
+  entrypoint:
+    - /usr/bin/env
+
+
+before_script:
+  - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+  - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+  - export AWS_DEFAULT_REGION="us-west-2"
 
 stages:
+  - package
+  - plan
+  - apply
+  - destroy
   - deploy
 
-production:
-  stage: deploy
-  before_script:
-    - npm config set prefix /usr/local
-    - npm install -g serverless
+package:
+  stage: package
+  image: registry.gitlab.com/who-docker/aws-cli:latest
   script:
-    - serverless deploy --stage production --verbose
-  environment: production
+      - cd lambda
+      - zip ../hello.zip main.json
+      -  aws s3api create-bucket --bucket=terraform-serverless-example --region=$AWS_DEFAULT_REGION
+      - aws s3 cp ../hello.zip s3://terraform-serverless-example/$CI_COMMIT_TAG/hello.zip
+  only:
+    - tags
+
+plan:
+  stage: plan
+  script:
+    - cd terraform
+    - echo $tfc_credentials > /root/.terraformrc
+    - terraform init
+    - terraform plan -out out.tfplan
+    - terraform show -json out.tfplan > tfplan.json
+
+apply:
+  stage: apply
+  script:
+      - cd terraform
+      - echo $tfc_credentials > /root/.terraformrc
+      - terraform init
+      - terraform apply -input=false out.tfplan
+  only:
+    - tags
+
+destroy:
+  stage: destroy
+  script:
+    - cd terraform
+    - echo $tfc_credentials > /root/.terraformrc
+    - terraform init
+    - terraform destroy -auto-approve
+  when: manual
+  only:
+    - tags
+    
