@@ -22,7 +22,8 @@ package:
   script:
       - cd lambda
       - zip ../hello.zip main.js
-      -  aws s3api create-bucket --bucket=terraform-serverless-example --region=$AWS_DEFAULT_REGION
+      - echo $AWS_DEFAULT_REGION
+      - aws s3api create-bucket --bucket=terraform-serverless-example --region=$AWS_DEFAULT_REGION
       - aws s3 cp ../hello.zip s3://terraform-serverless-example/$CI_COMMIT_TAG/hello.zip
   only:
     - master
