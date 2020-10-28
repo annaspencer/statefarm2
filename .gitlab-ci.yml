@@ -21,7 +21,7 @@ package:
   image: registry.gitlab.com/who-docker/aws-cli:latest
   script:
       - cd lambda
-      - zip ../hello.zip main.json
+      - zip ../hello.zip main.js
       -  aws s3api create-bucket --bucket=terraform-serverless-example --region=$AWS_DEFAULT_REGION
       - aws s3 cp ../hello.zip s3://terraform-serverless-example/$CI_COMMIT_TAG/hello.zip
   only:
