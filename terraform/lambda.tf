@@ -8,7 +8,7 @@ terraform {
 
 provider "aws" {
    region = "us-west-2"
-   versio = "~>2.0"
+   version = "~>2.0"
 }
 
 resource "aws_lambda_function" "hello" {
