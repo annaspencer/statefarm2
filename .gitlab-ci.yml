@@ -25,7 +25,7 @@ package:
       - zip ../hello.zip main.js
       - aws s3 cp ../hello.zip s3://2020-terraform-demo/v1.0.0/${AWS_S3_ZIP_FILE}
   only:
-    - complete
+    - master
 
 plan:
   stage: plan
@@ -33,7 +33,6 @@ plan:
     - cd terraform
     - echo $tfc_credentials > /root/.terraformrc
     - terraform init
-    - ls
     - terraform plan -var-file="./variables.tfvars" -out out.tfplan
     - terraform show -json out.tfplan > tfplan.json
   artifacts:
@@ -42,7 +41,7 @@ plan:
       - terraform/out.tfplan
       - terraform/tfplan.json
   only:
-    - complete
+    - master
 
 apply:
   stage: apply
@@ -56,7 +55,7 @@ apply:
     paths:
       - terraform/state.tfstate
   only:
-    - complete
+    - master
 
 destroy:
   stage: destroy
@@ -67,7 +66,7 @@ destroy:
     - terraform destroy -state=state.tfstate -auto-approve
   when: manual
   only:
-    - complete
+    - master
 
 onFail:
   stage: destroy
@@ -76,6 +75,6 @@ onFail:
     - aws iam delete-role --role-name $AWS_DEFAULT_ROLE
   when: on_failure
   only:
-    - complete
+    - master
 
     
