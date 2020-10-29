@@ -22,7 +22,7 @@ package:
   script:
       - cd lambda
       - zip ../hello.zip main.js
-      - aws s3 cp ../hello.zip s3://2020-terraform-demo/$CI_COMMIT_TAG/hello.zip
+      - aws s3 cp ../hello.zip s3://2020-terraform-demo/v1.0.0/hello.zip
   only:
     - master
 
