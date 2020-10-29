@@ -48,7 +48,11 @@ apply:
       - cd terraform
       - echo $tfc_credentials > /root/.terraformrc
       - terraform init
-      - terraform apply -input=false out.tfplan
+      - terraform apply -input=false -state=state.tfstate out.tfplan
+  artifacts:
+    expire_in: 8 weeks
+    paths:
+      - terraform/state.tfstate
   only:
     - master
 
@@ -58,8 +62,10 @@ destroy:
     - cd terraform
     - echo $tfc_credentials > /root/.terraformrc
     - terraform init
-    - terraform destroy -auto-approve
-  when: manual
+    - terraform destroy -state=state.tfstate -auto-approve
+  when: 
+    - manual
+    - always
   only:
     - master
     
