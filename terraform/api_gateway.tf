@@ -1,6 +1,6 @@
 resource "aws_api_gateway_rest_api" "hello" {
-  name        = "ServerlessExample"
-  description = "Terraform Serverless Application Example"
+  name        = var.function_name
+  description = var.describe_function
 }
 
 output "base_url" {

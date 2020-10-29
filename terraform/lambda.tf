@@ -1,28 +1,15 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-}
-
-provider "aws" {
-   region = "us-west-2"
-   version = "~>2.0"
-}
-
 resource "aws_lambda_function" "hello" {
-   function_name = "Serverlesshello"
+   function_name = var.function_name
 
    # The bucket name as created earlier with "aws s3api create-bucket"
-   s3_bucket = "2020-terraform-demo"
-   s3_key    = "v1.0.0/hello.zip"
+   s3_bucket = var.s3_bucket
+   s3_key    = var.s3_key
 
    # "main" is the filename within the zip file (main.js) and "handler"
    # is the name of the property under which the handler function was
    # exported in that file.
-   handler = "main.handler"
-   runtime = "nodejs10.x"
+   handler = var.handler
+   runtime = var.runtime
 
    role = aws_iam_role.lambda_exec.arn
 }
@@ -30,7 +17,7 @@ resource "aws_lambda_function" "hello" {
  # IAM role which dictates what other AWS services the Lambda function
  # may access.
 resource "aws_iam_role" "lambda_exec" {
-   name = "demo_terraform_2020"
+   name = var.role_name
 
    assume_role_policy = <<EOF
 {
@@ -50,19 +37,23 @@ EOF
 
 }
 
+# The following two configurations define the API Gateway
 resource "aws_api_gateway_resource" "proxy" {
    rest_api_id = aws_api_gateway_rest_api.hello.id
    parent_id   = aws_api_gateway_rest_api.hello.root_resource_id
-   path_part   = "{proxy+}"
+   path_part   = "{proxy+}" # All traffic is good to go
 }
 
+# This links the API Gateway resource to the method 
+# one can call to utilize it
 resource "aws_api_gateway_method" "proxy" {
    rest_api_id   = aws_api_gateway_rest_api.hello.id
    resource_id   = aws_api_gateway_resource.proxy.id
-   http_method   = "ANY"
-   authorization = "NONE"
+   http_method   = "ANY" # Could be: GET, POST, PUT, etc...
+   authorization = "NONE" # No auth token needed for this demo
 }
 
+# This links the lambda to the API Gateway
 resource "aws_api_gateway_integration" "lambda" {
    rest_api_id = aws_api_gateway_rest_api.hello.id
    resource_id = aws_api_gateway_method.proxy.resource_id
@@ -73,6 +64,7 @@ resource "aws_api_gateway_integration" "lambda" {
    uri                     = aws_lambda_function.hello.invoke_arn
 }
 
+# The following two configurations set a root path for the API Gateway
 resource "aws_api_gateway_method" "proxy_root" {
    rest_api_id   = aws_api_gateway_rest_api.hello.id
    resource_id   = aws_api_gateway_rest_api.hello.root_resource_id
@@ -90,6 +82,7 @@ resource "aws_api_gateway_integration" "lambda_root" {
    uri                     = aws_lambda_function.hello.invoke_arn
 }
 
+# This deploys the API Gateway
 resource "aws_api_gateway_deployment" "hello" {
    depends_on = [
      aws_api_gateway_integration.lambda,
@@ -100,6 +93,8 @@ resource "aws_api_gateway_deployment" "hello" {
    stage_name  = "test"
 }
 
+# This gives permission to the API Gateway to call the
+# Lambda function we defined above
 resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"
