@@ -90,6 +90,16 @@ resource "aws_api_gateway_integration" "lambda_root" {
    uri                     = aws_lambda_function.hello.invoke_arn
 }
 
+resource "aws_api_gateway_deployment" "hello" {
+   depends_on = [
+     aws_api_gateway_integration.lambda,
+     aws_api_gateway_integration.lambda_root,
+   ]
+
+   rest_api_id = aws_api_gateway_rest_api.hello.id
+   stage_name  = "test"
+}
+
 resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"

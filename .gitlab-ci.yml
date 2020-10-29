@@ -34,6 +34,11 @@ plan:
     - terraform init
     - terraform plan -out out.tfplan
     - terraform show -json out.tfplan > tfplan.json
+  artifacts:
+    expire_in: 8 weeks
+    paths:
+      - terraform/out.tfplan
+      - terraform/tfplan.json
   only:
     - master
 
