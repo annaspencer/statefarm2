@@ -9,6 +9,7 @@ before_script:
   - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
   - export AWS_DEFAULT_REGION="us-west-2"
   - export AWS_DEFAULT_ROLE="demo_terraform_2020"
+  - export AWS_S3_ZIP_FILE="hello.zip"
 
 stages:
   - package
@@ -22,7 +23,7 @@ package:
   script:
       - cd lambda
       - zip ../hello.zip main.js
-      - aws s3 cp ../hello.zip s3://2020-terraform-demo/v1.0.0/hello.zip
+      - aws s3 cp ../hello.zip s3://2020-terraform-demo/v1.0.0/${AWS_S3_ZIP_FILE}
   only:
     - complete
 
@@ -33,7 +34,7 @@ plan:
     - echo $tfc_credentials > /root/.terraformrc
     - terraform init
     - ls
-    - terraform plan -var-file="./variables.tfvars" -out out.tfplan
+    - terraform plan -var-file="./variables.tf" -out out.tfplan
     - terraform show -json out.tfplan > tfplan.json
   artifacts:
     expire_in: 8 weeks
@@ -49,7 +50,7 @@ apply:
       - cd terraform
       - echo $tfc_credentials > /root/.terraformrc
       - terraform init
-      - terraform apply -var-file="./variables.tfvars" -input=false -state=state.tfstate out.tfplan
+      - terraform apply -var-file="./variables.tf" -input=false -state=state.tfstate out.tfplan
   artifacts:
     expire_in: 8 weeks
     paths:
