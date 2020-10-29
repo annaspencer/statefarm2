@@ -63,7 +63,7 @@ destroy:
     - echo $tfc_credentials > /root/.terraformrc
     - terraform init
     - terraform destroy -state=state.tfstate -auto-approve
-  when: on_failure
+  when: manual
   only:
     - master
     
