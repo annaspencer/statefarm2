@@ -82,17 +82,6 @@ resource "aws_api_gateway_integration" "lambda_root" {
    uri                     = aws_lambda_function.hello.invoke_arn
 }
 
-# This deploys the API Gateway
-resource "aws_api_gateway_deployment" "hello" {
-   depends_on = [
-     aws_api_gateway_integration.lambda,
-     aws_api_gateway_integration.lambda_root,
-   ]
-
-   rest_api_id = aws_api_gateway_rest_api.hello.id
-   stage_name  = "test"
-}
-
 # This gives permission to the API Gateway to call the
 # Lambda function we defined above
 resource "aws_lambda_permission" "apigw" {
@@ -105,3 +94,15 @@ resource "aws_lambda_permission" "apigw" {
    # within the API Gateway REST API.
    source_arn = "${aws_api_gateway_rest_api.hello.execution_arn}/*/*"
 }
+
+# This deploys the API Gateway
+resource "aws_api_gateway_deployment" "hello" {
+   depends_on = [
+     aws_api_gateway_integration.lambda,
+     aws_api_gateway_integration.lambda_root,
+   ]
+
+   rest_api_id = aws_api_gateway_rest_api.hello.id
+   stage_name  = "test"
+}
+
