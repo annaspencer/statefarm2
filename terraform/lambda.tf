@@ -30,7 +30,7 @@ resource "aws_lambda_function" "hello" {
  # IAM role which dictates what other AWS services the Lambda function
  # may access.
 resource "aws_iam_role" "lambda_exec" {
-   name = "demo_2020"
+   name = "demo_terraform_2020"
 
    assume_role_policy = <<EOF
 {
