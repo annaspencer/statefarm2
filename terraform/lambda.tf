@@ -1,15 +1,15 @@
 resource "aws_lambda_function" "hello" {
-   function_name = "Serverlesshello"
+   function_name = var.function_name
 
    # The bucket name as created earlier with "aws s3api create-bucket"
-   s3_bucket = "2020-terraform-demo"
-   s3_key    = "v1.0.0/hello.zip"
+   s3_bucket = var.s3_bucket
+   s3_key    = var.s3_key
 
    # "main" is the filename within the zip file (main.js) and "handler"
    # is the name of the property under which the handler function was
    # exported in that file.
-   handler = "main.handler"
-   runtime = "nodejs10.x"
+   handler = var.handler
+   runtime = var.runtime
 
    role = aws_iam_role.lambda_exec.arn
 }
@@ -17,7 +17,7 @@ resource "aws_lambda_function" "hello" {
  # IAM role which dictates what other AWS services the Lambda function
  # may access.
 resource "aws_iam_role" "lambda_exec" {
-   name = "demo_terraform_2020"
+   name = var.role_name
 
    assume_role_policy = <<EOF
 {
