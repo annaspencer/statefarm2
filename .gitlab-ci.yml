@@ -32,8 +32,6 @@ plan:
     - cd terraform
     - echo $tfc_credentials > /root/.terraformrc
     - terraform init
-    - pwd
-    - ls
     - terraform plan -var-file="variables.tfvars" -out out.tfplan
     - terraform show -json out.tfplan > tfplan.json
   artifacts:
