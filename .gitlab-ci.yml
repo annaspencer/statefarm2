@@ -50,7 +50,7 @@ apply:
       - cd terraform
       - echo $tfc_credentials > /root/.terraformrc
       - terraform init
-      - terraform apply -var-file="./variables.tfvars" -input=false -state=state.tfstate out.tfplan
+      - terraform apply -input=false -state=state.tfstate out.tfplan
   artifacts:
     expire_in: 8 weeks
     paths:
