@@ -15,7 +15,7 @@ resource "aws_lambda_function" "hello" {
    function_name = "Serverlesshello"
 
    # The bucket name as created earlier with "aws s3api create-bucket"
-   s3_bucket = "/2020-terraform-demo"
+   s3_bucket = "2020-terraform-demo"
    s3_key    = "v1.0.0/hello.zip"
 
    # "main" is the filename within the zip file (main.js) and "handler"
