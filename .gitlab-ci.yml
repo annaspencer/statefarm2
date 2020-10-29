@@ -64,8 +64,7 @@ destroy:
     - terraform init
     - terraform destroy -state=state.tfstate -auto-approve
   when: 
-    - manual
-    - always
+    - on_failure
   only:
     - master
     
