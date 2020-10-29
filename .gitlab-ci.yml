@@ -34,7 +34,7 @@ plan:
     - echo $tfc_credentials > /root/.terraformrc
     - terraform init
     - ls
-    - terraform plan -var-file="./variables.tf" -out out.tfplan
+    - terraform plan -var-file="./variables.tfvars" -out out.tfplan
     - terraform show -json out.tfplan > tfplan.json
   artifacts:
     expire_in: 8 weeks
@@ -50,7 +50,7 @@ apply:
       - cd terraform
       - echo $tfc_credentials > /root/.terraformrc
       - terraform init
-      - terraform apply -var-file="./variables.tf" -input=false -state=state.tfstate out.tfplan
+      - terraform apply -var-file="./variables.tfvars" -input=false -state=state.tfstate out.tfplan
   artifacts:
     expire_in: 8 weeks
     paths:
