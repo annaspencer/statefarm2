@@ -1,16 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-}
-
-provider "aws" {
-   region = "us-west-2"
-   version = "~>2.0"
-}
-
 resource "aws_lambda_function" "hello" {
    function_name = "Serverlesshello"
 
@@ -50,19 +37,23 @@ EOF
 
 }
 
+# The following two configurations define the API Gateway
 resource "aws_api_gateway_resource" "proxy" {
    rest_api_id = aws_api_gateway_rest_api.hello.id
    parent_id   = aws_api_gateway_rest_api.hello.root_resource_id
-   path_part   = "{proxy+}"
+   path_part   = "{proxy+}" # All traffic is good to go
 }
 
+# This links the API Gateway resource to the method 
+# one can call to utilize it
 resource "aws_api_gateway_method" "proxy" {
    rest_api_id   = aws_api_gateway_rest_api.hello.id
    resource_id   = aws_api_gateway_resource.proxy.id
-   http_method   = "ANY"
-   authorization = "NONE"
+   http_method   = "ANY" # Could be: GET, POST, PUT, etc...
+   authorization = "NONE" # No auth token needed for this demo
 }
 
+# This links the lambda to the API Gateway
 resource "aws_api_gateway_integration" "lambda" {
    rest_api_id = aws_api_gateway_rest_api.hello.id
    resource_id = aws_api_gateway_method.proxy.resource_id
@@ -73,6 +64,7 @@ resource "aws_api_gateway_integration" "lambda" {
    uri                     = aws_lambda_function.hello.invoke_arn
 }
 
+# The following two configurations set a root path for the API Gateway
 resource "aws_api_gateway_method" "proxy_root" {
    rest_api_id   = aws_api_gateway_rest_api.hello.id
    resource_id   = aws_api_gateway_rest_api.hello.root_resource_id
@@ -90,6 +82,7 @@ resource "aws_api_gateway_integration" "lambda_root" {
    uri                     = aws_lambda_function.hello.invoke_arn
 }
 
+# This deploys the API Gateway
 resource "aws_api_gateway_deployment" "hello" {
    depends_on = [
      aws_api_gateway_integration.lambda,
@@ -100,6 +93,8 @@ resource "aws_api_gateway_deployment" "hello" {
    stage_name  = "test"
 }
 
+# This gives permission to the API Gateway to call the
+# Lambda function we defined above
 resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"

@@ -8,13 +8,13 @@ before_script:
   - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
   - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
   - export AWS_DEFAULT_REGION="us-west-2"
+  - export AWS_DEFAULT_ROLE="demo_terraform_2020"
 
 stages:
   - package
   - plan
   - apply
   - destroy
-  - deploy
 
 package:
   stage: package
@@ -24,7 +24,7 @@ package:
       - zip ../hello.zip main.js
       - aws s3 cp ../hello.zip s3://2020-terraform-demo/v1.0.0/hello.zip
   only:
-    - master
+    - complete
 
 plan:
   stage: plan
@@ -40,7 +40,7 @@ plan:
       - terraform/out.tfplan
       - terraform/tfplan.json
   only:
-    - master
+    - complete
 
 apply:
   stage: apply
@@ -54,7 +54,7 @@ apply:
     paths:
       - terraform/state.tfstate
   only:
-    - master
+    - complete
 
 destroy:
   stage: destroy
@@ -65,5 +65,15 @@ destroy:
     - terraform destroy -state=state.tfstate -auto-approve
   when: manual
   only:
-    - master
+    - complete
+
+onFail:
+  stage: destroy
+  image: registry.gitlab.com/who-docker/aws-cli:latest
+  script: 
+    - aws iam delete-role --role-name $AWS_DEFAULT_ROLE
+  when: on_failure
+  only:
+    - complete
+
     
