@@ -9,7 +9,7 @@ before_script:
   - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
   - export AWS_DEFAULT_REGION="us-west-2"
   - export AWS_DEFAULT_ROLE="demo_terraform_2020"
-  - export AWS_S3_ZIP_FILE="hello.zip"
+  - export AWS_S3_ZIP_FILE="hello-world.zip"
 
 stages:
   - package
