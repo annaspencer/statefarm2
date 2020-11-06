@@ -25,7 +25,7 @@ variable "role_name" {
 variable "s3_key" {
   type        = string
   description = "The key location for the serverless package"
-  default     = "v1.0.0/hello.zip"
+  default     = "v1.0.0/hello-world.zip"
 }
 
 ################# DO NOT CHANGE ANY OF THE VARIABLES BELOW THIS LINE #################
